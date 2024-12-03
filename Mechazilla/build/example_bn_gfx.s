@@ -9,7 +9,7 @@
 @	+ affine map, not compressed, 16x16 
 @	Total size: 64 + 6080 + 256 = 6400
 @
-@	Time-stamp: 2024-12-03, 04:32:04
+@	Time-stamp: 2024-12-03, 07:08:49
 @	Exported by Cearn's GBA Image Transmogrifier, v0.9.2
 @	( http://www.coranac.com/projects/#grit )
 @

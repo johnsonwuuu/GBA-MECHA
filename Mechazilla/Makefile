@@ -33,7 +33,7 @@ BUILD       	:=  build
 LIBBUTANO   	:=  ../butano
 PYTHON      	:=  python
 SOURCES     	:=  src /src
-INCLUDES    	:=  include /include
+INCLUDES    	:=  include /include $(LIBBUTANOABS)/common/include ../butano/common/include
 DATA        	:=
 GRAPHICS    	:=  graphics /graphics
 AUDIO       	:=  audio /audio
@@ -55,8 +55,13 @@ EXTTOOL     	:=
 # Export absolute butano path:
 #---------------------------------------------------------------------------------------------------------------------
 ifndef LIBBUTANOABS
-	export LIBBUTANOABS	:=	$(realpath $(LIBBUTANO))
+	export LIBBUTANOABS	:=	$(abspath ../butano)
 endif
+
+#---------------------------------------------------------------------------------------------------------------------
+# Export CXXFLAGS:
+#---------------------------------------------------------------------------------------------------------------------
+export CXXFLAGS    += -I$(LIBBUTANOABS)/common/include
 
 #---------------------------------------------------------------------------------------------------------------------
 # Include main makefile:

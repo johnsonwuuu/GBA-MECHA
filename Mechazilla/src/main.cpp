@@ -3,9 +3,21 @@
 #include "bn_sprite_ptr.h"
 #include "bn_math.h"
 #include "bn_fixed.h"
-#include "bn_sprite_items_mechazilla.h" // Include your sprite assets here
-// #include "bn_sound_items_explosion.h"
-// #include "bn_sound_items_flame.h"
+#include "bn_sprite_items_mechazilla.h"
+#include "bn_regular_bg_ptr.h"
+#include "bn_regular_bg_items_stage1.h"
+#include "bn_regular_bg_items_stage2.h"
+#include "bn_regular_bg_items_stage3.h"
+#include "bn_keypad.h"
+#include "bn_sprite_items_rocket.h"
+
+const int FRAME_LIMIT = 60;
+
+enum class GameStage {
+    STAGE1,
+    STAGE2,
+    STAGE3
+};
 
 class Booster
 {
@@ -17,54 +29,57 @@ private:
     bn::fixed omega_r;       // Angular velocity
     bn::fixed alpha_r;       // Angular acceleration
     bn::fixed theta_v;       // Thrust vector angle relative to the rocket
-    const bn::fixed mass;    // Mass of the booster
-    const bn::fixed inertia; // Moment of inertia
-    const bn::fixed height;  // Height of the booster
+    bn::fixed mass;          // Mass of the booster
+    bn::fixed inertia;       // Moment of inertia
+    bn::fixed height;        // Height of the booster
+    static constexpr bn::fixed GRAVITY = 0.2;  // Gravity constant
+    static constexpr bn::fixed MOVE_SPEED = 1; // Horizontal movement speed
 
 public:
     Booster(bn::fixed initial_x, bn::fixed initial_y, bn::fixed booster_mass, bn::fixed booster_inertia, bn::fixed booster_height)
-        : x(initial_x), y(initial_y), vx(0), vy(0), ax(0), ay(0), theta_r(0), omega_r(0), alpha_r(0), theta_v(0),
+        : x(initial_x), y(initial_y), vx(0), vy(0), ax(0), ay(GRAVITY), theta_r(0), omega_r(0), alpha_r(0), theta_v(0),
           mass(booster_mass), inertia(booster_inertia), height(booster_height)
     {
     }
 
-    void apply_thrust(bn::fixed thrust, bn::fixed theta_v_input)
+    void move_left()
     {
-        theta_v = theta_v_input;
-        bn::fixed theta_t = theta_r - theta_v;
+        vx = -MOVE_SPEED;
+    }
 
-        ax = (thrust * bn::sin(theta_t)) / mass;
-        ay = (thrust * bn::cos(theta_t)) / mass;
+    void move_right()
+    {
+        vx = MOVE_SPEED;
+    }
 
-        bn::fixed torque = (height / 2) * thrust * bn::sin(theta_t);
-        alpha_r = torque / inertia;
+    void stop_horizontal()
+    {
+        vx = 0;
     }
 
     void update(bn::fixed dt)
     {
-        // Update translational parameters
-        vx += ax * dt;
+        // Apply gravity
         vy += ay * dt;
+
+        // Update position
         x += vx * dt;
         y += vy * dt;
 
-        // Update rotational parameters
+        // Update rotation
         omega_r += alpha_r * dt;
         theta_r += omega_r * dt;
     }
 
-    bool is_landed(bn::fixed screen_width, bn::fixed screen_height)
+    void reset_position(bn::fixed new_x, bn::fixed new_y)
     {
-        // Check if landed safely
-        return (y >= screen_height - height / 2) &&
-               (bn::abs(vx) < 1 && bn::abs(vy) < 1 && bn::abs(omega_r) < 0.1);
-    }
-
-    bool is_crashed(bn::fixed screen_width, bn::fixed screen_height)
-    {
-        // Check if crashed
-        return (y >= screen_height - height / 2) &&
-               (bn::abs(vx) >= 1 || bn::abs(vy) >= 1 || bn::abs(omega_r) >= 0.1);
+        x = new_x;
+        y = new_y;
+        vx = 0;
+        vy = 0;
+        theta_r = 0;
+        omega_r = 0;
+        alpha_r = 0;
     }
 
     bn::fixed get_x() const { return x; }
@@ -76,44 +91,57 @@ int main()
 {
     bn::core::init();
 
+    // Initialize with stage1
+    GameStage current_stage = GameStage::STAGE1;
+    bn::regular_bg_ptr current_bg = bn::regular_bg_items::stage1.create_bg(0, 0);
+
     // Screen dimensions
     const bn::fixed screen_width = 240;
     const bn::fixed screen_height = 160;
+    const bn::fixed sprite_width = 16;  // Typical sprite width
 
-    // Booster initialization
-    Booster booster(screen_width / 2, 20, 100, 50, 20);
-    bn::sprite_ptr booster_sprite = bn::sprite_items::mechazilla.create_sprite(booster.get_x(), booster.get_y());
-
-    // Simulation parameters
-    const bn::fixed dt = 0.1;
-    // std::vector<bn::fixed, 100> thrust_curve = {5, 5, 5, 0, 0}; // Example thrust values
-    std::vector<bn::fixed> thrust_curve = {5, 5, 5, 0, 0}; // Dynamically sized vector
-
-    int thrust_index = 0;
+    // Booster initialization - start from top center of screen
+    Booster booster(screen_width / 2, -sprite_width, 100, 50, 20);
+    bn::sprite_ptr booster_sprite = bn::sprite_items::rocket.create_sprite(booster.get_x(), booster.get_y());
 
     // Game loop
     while (true)
     {
-        if (thrust_index < thrust_curve.size())
+        // Stage transition logic
+        if(bn::keypad::l_pressed())
         {
-            booster.apply_thrust(thrust_curve[thrust_index], 0); // Assuming no thrust vectoring
-            thrust_index++;
+            // ... existing stage transition code ...
+        }
+        else if(bn::keypad::r_pressed())
+        {
+            // ... existing stage transition code ...
         }
 
-        booster.update(dt);
+        // Handle rocket movement with screen boundaries
+        if(bn::keypad::left_held() && booster.get_x() > sprite_width)
+        {
+            booster.move_left();
+        }
+        else if(bn::keypad::right_held() && booster.get_x() < screen_width - sprite_width)
+        {
+            booster.move_right();
+        }
+        else
+        {
+            booster.stop_horizontal();
+        }
 
+        // Update rocket physics
+        booster.update(0.1);
+
+        // Update sprite position
         booster_sprite.set_position(booster.get_x(), booster.get_y());
         booster_sprite.set_rotation_angle(booster.get_theta_r());
 
-        if (booster.is_landed(screen_width, screen_height))
+        // Reset position if rocket goes off screen bottom
+        if(booster.get_y() > screen_height + sprite_width)
         {
-            // bn::sound_items::flame.play();
-            break; // Winning condition
-        }
-        else if (booster.is_crashed(screen_width, screen_height))
-        {
-            // bn::sound_items::explosion.play();
-            break; // Losing condition
+            booster.reset_position(screen_width / 2, -sprite_width);
         }
 
         bn::core::update();
