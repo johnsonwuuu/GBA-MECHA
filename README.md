@@ -1,3 +1,4 @@
 # GBA_Final
-Final Project for Computer Organization
-Based off of https://mechazilla.io/ for GBA
+This is the Final Project repository for the Computer Organization Course @GSU Professor - Jean Guo
+
+This game is a replication of mechazilla.io
