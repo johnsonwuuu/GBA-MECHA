@@ -1,16 +1,41 @@
-# GBA_Final
-This is the Final Project repository for the Computer Organization Course @GSU
-Professor - Jean Guo
+# GBA MECHA Game
 
-This game is more than just for the grades though. It includes numerical state vector updation just like you would do in a real Falcon 9 like rocket.
+A Game Boy Advance game recreation of https://mechazilla.io/
+Your mission: Land the rocket perfectly upright without any residual angular velocity or translational momentum.
 
-# Game Context Story:
-You are a Niel Marstrong, your vehicle is about to land on Mars and the section of memory that had the tunable control paramters for landing seem to have been affected by high energy cosmic particles that comes form outer space in events like black hole merger, supernove, black hole jets, pulsars' jet. 
+## Technical Details
 
-You printed out the fixed thrust curve just to check if even that got corrupted or not.
-Gladly that's preserved!
+This game is built using:
+- C++ programming language
+- DevkitARM GBA toolchain
+- Mode 3 bitmap graphics (3 Levels)
+- DMA for efficient memory transfers
+- Hardware sprites for character animations
+- Numerical state vector updates
 
-Now you're overwritting the control systems using left and the right keys. The control authority is successfully transferred to the keyboard buttons! Command the module to land perfectly upright, without having any angular velocity or any other needless angular or translational momentum!
+## Prerequisites
 
-Now your and the rest of your crew's life depends upon your ability to manually control the thrust vector,
-The booster is out of control and the life of astronauts in the is to.
+To build and run this game, you need:
+- DevkitPro with DevkitARM installed
+- A GBA emulator (like mGBA, VBA-M, or NO$GBA)
+- Make utility
+
+## Building the Game
+
+1. Open your terminal/command prompt
+2. Navigate to the project directory
+3. Run the make command:
+This will compile the source code and create a .gba file.
+
+## Running the Game
+
+You can run the generated .gba file using any GBA emulator:
+- mGBA: Open mGBA and load the .gba file
+- VBA-M: Open VBA-M and load the .gba file
+- Hardware: Load the .gba file onto a flash cart
+
+## Controls
+- Left/Right Keys: Override control systems to adjust thrust vector
+- The goal is to land perfectly upright
+- Avoid any angular velocity or unnecessary momentum
+- Monitor the fixed thrust curve for guidance
