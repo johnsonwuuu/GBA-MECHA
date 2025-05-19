@@ -1,6 +1,6 @@
 # GBA MECHA Game
 
-A Game Boy Advance game recreation of https://mechazilla.io/
+A Game Boy Advance game recreation of https://mechazilla.io/  
 Your mission: Land the rocket perfectly upright without any residual angular velocity or translational momentum.
 
 ## Technical Details
